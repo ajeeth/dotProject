@@ -4,7 +4,7 @@ services:
     image: mariadb
     restart: always
     volumes:
-      - dpdb:/var/lib/mysql
+      - ./appdata/mariadb-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: secretpw
       MYSQL_USER: ${DB_USER}
@@ -12,13 +12,13 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
 
   phpfpm:
-    build: ./.docker-compose
+    build: ./appdata/www/.docker-compose
     image: phpfpm-7.4:local
     restart: always
     depends_on:
       - "mariadb"
     volumes:
-      - ./:/var/www/html
+      - ./appdata/www:/var/www/html
 
   nginx:
     image: nginx
@@ -26,10 +26,7 @@ services:
       - "mariadb"
       - "phpfpm"
     volumes:
-      - ./:/var/www/html
-      - ./.docker-compose/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./appdata/www:/var/www/html
+      - ./appdata/www/.docker-compose/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - "80:80"
-
-volumes:
-  dpdb:
+      - "7080:80"
